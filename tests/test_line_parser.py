@@ -48,6 +48,14 @@ class ParseTest(unittest.TestCase):
         """Пустая строка не является командой."""
         self.assertIsNone(parse("   ", ENV))
 
+    def test_comment_ignored(self):
+        """Всё после # отбрасывается как комментарий."""
+        self.assertEqual(parse("ls -a  # hidden", ENV), ("ls", ["-a"]))
+
+    def test_comment_only_line(self):
+        """Строка из одного комментария не является командой."""
+        self.assertIsNone(parse("# comment", ENV))
+
     def test_unclosed_quote(self):
         """Незакрытая кавычка вызывает ошибку разбора."""
         with self.assertRaises(ParseError):

@@ -46,6 +46,9 @@ def run_line(line):
 def repl():
     """Запускает интерактивный режим эмулятора.
 
+    Если ввод перенаправлен (не с клавиатуры), введённая команда
+    печатается после приглашения, чтобы ввод выглядел как диалог.
+
     Returns:
         Код возврата эмулятора.
     """
@@ -58,6 +61,8 @@ def repl():
         except KeyboardInterrupt:
             print()
             continue
+        if not sys.stdin.isatty():
+            print(line)
         try:
             run_line(line)
         except ExitRequest as request:

@@ -1,6 +1,7 @@
 """Команды эмулятора оболочки."""
 
 EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
 MAX_CD_ARGS = 1
 MAX_EXIT_ARGS = 1
 

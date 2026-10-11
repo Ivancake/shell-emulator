@@ -33,9 +33,10 @@ def expand_variables(text, env=None):
 def parse(line, env=None):
     """Разбивает строку на имя команды и аргументы.
 
-    Кавычки группируют слова в один аргумент. Переменные окружения
-    раскрываются после разбиения, поэтому пути Windows с обратными
-    слэшами (например, значение $USERPROFILE) не искажаются.
+    Кавычки группируют слова в один аргумент, всё после # считается
+    коммеентарием. Переменные окружения раскрываются после разбиения,
+    поэтому пути Windows с обратнымислэшами
+    (например, значение $USERPROFILE) не искажаются.
 
     Args:
         line: введённая пользователем строка.
@@ -48,7 +49,7 @@ def parse(line, env=None):
         ParseError: если в строке есть незакрытая кавычка.
     """
     try:
-        tokens = shlex.split(line)
+        tokens = shlex.split(line, comments=True)
     except ValueError as error:
         raise ParseError(f"syntax error: {error}") from error
     if not tokens:
