@@ -1,0 +1,2 @@
+path,type,data
+/broken.txt,file,not*base64!

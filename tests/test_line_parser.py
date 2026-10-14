@@ -61,5 +61,13 @@ class ParseTest(unittest.TestCase):
         with self.assertRaises(ParseError):
             parse('ls "abc', ENV)
 
+    def test_empty_variable_dropped(self):
+        """Слово, ставшее пустым после раскрытия, отбрасывается."""
+        self.assertEqual(parse("ls $NOPE /tmp", ENV), ("ls", ["/tmp"]))
+
+    def test_only_empty_variable(self):
+        """Строка из одной пустой переменной не является командой."""
+        self.assertIsNone(parse("$NOPE", ENV))
+
 if __name__ == "__main__":
     unittest.main()

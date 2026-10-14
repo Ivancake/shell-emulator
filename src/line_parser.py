@@ -34,9 +34,10 @@ def parse(line, env=None):
     """Разбивает строку на имя команды и аргументы.
 
     Кавычки группируют слова в один аргумент, всё после # считается
-    коммеентарием. Переменные окружения раскрываются после разбиения,
-    поэтому пути Windows с обратнымислэшами
-    (например, значение $USERPROFILE) не искажаются.
+    комментарием. Переменные окружения раскрываются после разбиения,
+    поэтому пути Windows с обратными слэшами (например, значение
+    $USERPROFILE) не искажаются. Слова, ставшие пустыми после раскрытия
+    переменных, отбрасываются, как в bash.
 
     Args:
         line: введённая пользователем строка.
@@ -52,7 +53,8 @@ def parse(line, env=None):
         tokens = shlex.split(line, comments=True)
     except ValueError as error:
         raise ParseError(f"syntax error: {error}") from error
-    if not tokens:
+    expanded = [expand_variables(token, env) for token in tokens]
+    words = [word for word in expanded if word]
+    if not words:
         return None
-    tokens = [expand_variables(token, env) for token in tokens]
-    return tokens[0], tokens[1:]
+    return words[0], words[1:]

@@ -18,7 +18,7 @@ def is_command_line(line):
     return bool(stripped) and not stripped.startswith(COMMENT_PREFIX)
 
 
-def run_script(path):
+def run_script(path, state):
     """Выполняет команды из файла, имитируя диалог с пользователем.
 
     Перед каждой командой печатается приглашение и сама команда,
@@ -26,6 +26,7 @@ def run_script(path):
 
     Args:
         path: путь к файлу стартового скрипта.
+        state: состояние эмулятора.
 
     Raises:
         OSError: если файл не удалось прочитать.
@@ -36,4 +37,4 @@ def run_script(path):
     for line in lines:
         if is_command_line(line):
             print(make_prompt() + line)
-            run_line(line)
+            run_line(line, state)

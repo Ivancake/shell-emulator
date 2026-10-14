@@ -9,6 +9,7 @@ from line_parser import ParseError, parse
 
 HOME_SYMBOL = "~"
 
+
 def make_prompt(cwd=HOME_SYMBOL):
     """Формирует приглашение по данным реальной ОС.
 
@@ -20,13 +21,15 @@ def make_prompt(cwd=HOME_SYMBOL):
     """
     return f"{getpass.getuser()}@{socket.gethostname()}:{cwd}$ "
 
-def run_line(line):
+
+def run_line(line, state):
     """Разбирает и выполняет одну строку команды.
 
     Результат печатается в stdout, ошибки — в stderr.
 
     Args:
         line: строка, введённая пользователем.
+        state: состояние эмулятора.
 
     Raises:
         ExitRequest: если выполнена команда exit.
@@ -36,18 +39,22 @@ def run_line(line):
         if parsed is None:
             return
         name, args = parsed
-        output = execute(name, args)
+        output = execute(name, args, state)
     except (ParseError, CommandError) as error:
         print(error, file=sys.stderr)
         return
     if output:
         print(output)
 
-def repl():
+
+def repl(state):
     """Запускает интерактивный режим эмулятора.
 
     Если ввод перенаправлен (не с клавиатуры), введённая команда
-    печатается после приглашения, чтобы ввод выглядел как диалог.
+    печатается после приглашения, чтобы вывод выглядел как диалог.
+
+    Args:
+        state: состояние эмулятора.
 
     Returns:
         Код возврата эмулятора.
@@ -64,6 +71,6 @@ def repl():
         if not sys.stdin.isatty():
             print(line)
         try:
-            run_line(line)
+            run_line(line, state)
         except ExitRequest as request:
             return request.code

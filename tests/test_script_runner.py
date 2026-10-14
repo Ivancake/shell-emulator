@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from commands import ExitRequest  # noqa: E402
 from repl import make_prompt  # noqa: E402
 from script_runner import is_command_line, run_script  # noqa: E402
+from state import ShellState  # noqa: E402
 
 SCRIPT_EXIT_CODE = 7
 
@@ -51,7 +52,7 @@ class RunScriptTest(unittest.TestCase):
         path = self.write_script("# comment\nls a\n")
         output = io.StringIO()
         with redirect_stdout(output):
-            run_script(path)
+            run_script(path, ShellState())
         self.assertEqual(output.getvalue(), f"{make_prompt()}ls a\nls a\n")
 
     def test_errors_do_not_stop_script(self):
@@ -59,7 +60,7 @@ class RunScriptTest(unittest.TestCase):
         path = self.write_script("foo\nls b\n")
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
-            run_script(path)
+            run_script(path, ShellState())
         self.assertIn("foo: command not found", errors.getvalue())
         self.assertIn("ls b\n", output.getvalue())
 
@@ -68,13 +69,13 @@ class RunScriptTest(unittest.TestCase):
         path = self.write_script(f"exit {SCRIPT_EXIT_CODE}\nls\n")
         with redirect_stdout(io.StringIO()):
             with self.assertRaises(ExitRequest) as context:
-                run_script(path)
+                run_script(path, ShellState())
         self.assertEqual(context.exception.code, SCRIPT_EXIT_CODE)
 
     def test_missing_file(self):
         """Несуществующий файл вызывает OSError."""
         with self.assertRaises(OSError):
-            run_script(str(Path(self.tmp.name) / "missing.txt"))
+            run_script(str(Path(self.tmp.name) / "missing.txt"), ShellState())
 
 
 if __name__ == "__main__":
